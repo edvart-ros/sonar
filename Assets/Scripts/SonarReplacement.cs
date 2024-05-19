@@ -5,25 +5,22 @@ using UnityEngine.Rendering.HighDefinition;
 
 public class Sonar : MonoBehaviour
 {
+    public Shader SonarShader;
     private CustomPassVolume passVolume;
     private DrawRenderersCustomPass pass;
     private Camera cam;
     public float sonarRange = 30.0f;
-    public RenderTexture rt;
     
     void Start()
     {
-        rt = new RenderTexture(32, 32, 32, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
         cam = GetComponent<Camera>();
-        cam.targetTexture = rt;
-        GetComponent<TextureValueReader>().inputTexture = rt;
         passVolume = gameObject.AddComponent<CustomPassVolume>();
         passVolume.isGlobal = false;
         passVolume.targetCamera = cam;
-        passVolume.injectionPoint = CustomPassInjectionPoint.BeforeTransparent;
+        passVolume.injectionPoint = CustomPassInjectionPoint.AfterPostProcess;
         pass = new DrawRenderersCustomPass();
         pass.overrideMode = DrawRenderersCustomPass.OverrideMaterialMode.Shader;
-        pass.overrideShader = Shader.Find("Unlit/SonarShader");
+        pass.overrideShader = Shader.Find("Custom/SonarShader");
         pass.clearFlags = ClearFlag.All;
         passVolume.customPasses.Add(pass);
     }

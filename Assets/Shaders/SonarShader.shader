@@ -1,5 +1,5 @@
 
-Shader "Unlit/SonarShader"
+Shader "Custom/SonarShader"
 {
     Properties
     {
@@ -7,11 +7,10 @@ Shader "Unlit/SonarShader"
         _NormalMap ("Texture", 2D) = "white" {}
         _SonarFOV ("float", float) = 60.0
         _SonarRange ("float", float) = 20.0
+        _SonarIntensity ("float", float) = 1.0
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
 
         Pass
         {
@@ -43,6 +42,7 @@ Shader "Unlit/SonarShader"
             float4 _MainTex_ST;
             float _SonarFOV;
             float _SonarRange;
+            float _SonarIntensity;
 
             sampler2D _NormalMap;
             float4 _NormalMap_ST;
@@ -81,8 +81,7 @@ Shader "Unlit/SonarShader"
                 
                 float azimuthDeg = atan2(viewDirVS.x, viewDirVS.z)*Rad2Deg;
                 float azimuthNormed = azimuthDeg/(_SonarFOV/2.0);
-                return fixed4(0.5, 0.5, 0.5, 1.0);
-                //return float4(clamp(d/_SonarRange, 0, 1), intensity, azimuthNormed, 1);
+                return float4(clamp(d/_SonarRange, 0, 1), intensity, azimuthNormed, 1);
             }
             ENDCG
         }
