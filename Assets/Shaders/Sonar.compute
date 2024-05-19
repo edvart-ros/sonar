@@ -36,9 +36,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     debugTex[pixel.xy] = float4(nWS, 1.0);
     // result RGB: [distance, intensity, azimuth]. azimuth is mapped to (-1, 1)
     float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
-    //float azimuthNormed = (azimuthRad * RAD2DEG) / (fov / 2.0);
+    float azimuthNormed = (azimuthRad * RAD2DEG) / (fov / 2.0);
     float distanceNormed = d/sonarMaxRange;
-    resultTex[pixel.xy] = float4(distanceNormed, intensity, 0.0, 1.0);
+    resultTex[pixel.xy] = float4(clamp(distanceNormed, 0, 1), intensity, azimuthNormed, 1.0);
 
     // transform to 2D sonar image
     int2 origin = int2(res.x/2, res.y/2);
