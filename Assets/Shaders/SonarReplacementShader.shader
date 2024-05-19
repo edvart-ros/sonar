@@ -6,6 +6,7 @@ Shader "Unlit/SonarReplace"
         _MainTex ("Texture", 2D) = "white" {}
         _NormalMap ("Texture", 2D) = "white" {}
         _SonarFOV ("float", float) = 60.0
+        _SonarRange ("float", float) = 20.0
     }
     SubShader
     {
@@ -41,6 +42,7 @@ Shader "Unlit/SonarReplace"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float _SonarFOV;
+            float _SonarRange;
 
             sampler2D _NormalMap;
             float4 _NormalMap_ST;
@@ -77,10 +79,10 @@ Shader "Unlit/SonarReplace"
                 float intensity = -dot(viewDirWS, normalWS);
                 float d = length(i.posWS - _WorldSpaceCameraPos);
                 
-                float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
-                float fovRad = _SonarFOV*Deg2Rad;
-                float azimuthNormed = azimuthRad/(fovRad/2.0);
-                return float3(clamp(d/6.0, 0, 1), 0, 0);
+                float azimuthDeg = atan2(viewDirVS.x, viewDirVS.z)*Rad2Deg;
+                float azimuthNormed = azimuthDeg/(_SonarFOV/2.0);
+                return float3(2, 0, 0);
+                return float3(clamp(d/_SonarRange, 0, 1), intensity, azimuthNormed);
             }
             ENDCG
         }

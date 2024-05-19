@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 
@@ -7,6 +8,7 @@ public class SonarReplacement : MonoBehaviour
     private CustomPassVolume passVolume;
     private DrawRenderersCustomPass pass;
     private Camera cam;
+    public float sonarRange = 30.0f;
     
     void Start()
     {
@@ -25,5 +27,6 @@ public class SonarReplacement : MonoBehaviour
     void Update()
     {
         Shader.SetGlobalFloat("_SonarFOV", cam.fieldOfView);
+        Shader.SetGlobalFloat("_SonarRange", sonarRange);
     }
 }

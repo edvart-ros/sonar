@@ -39,6 +39,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float azimuthNormed = (azimuthRad * RAD2DEG) / (fov / 2.0);
     float distanceNormed = d/sonarMaxRange;
     resultTex[pixel.xy] = float4(clamp(distanceNormed, 0, 1), intensity, azimuthNormed, 1.0);
+    resultTex[pixel.xy] = float4(1, 1, 1, 1);
 
     // transform to 2D sonar image
     int2 origin = int2(res.x/2, res.y/2);

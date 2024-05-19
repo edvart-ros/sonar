@@ -21,7 +21,8 @@ Shader "Custom/SonarLit"
         _AlphaRemapMax("AlphaRemapMax", Float) = 1.0
         _AORemapMin("AORemapMin", Float) = 0.0
         _AORemapMax("AORemapMax", Float) = 1.0
-        _CameraFOV("_SonarFOV", Float) = 60.0
+        _SonarFOV("_SonarFOV", Float) = 60.0
+        _SonarRange("_SonarRange", Float) = 20.0
         
 
         _NormalMap("NormalMap", 2D) = "bump" {}     // Tangent space normal map
