@@ -1,0 +1,18 @@
+#pragma kernel CSMain
+Texture2D<float4> inTex;
+SamplerState linearClampSampler;
+
+RWStructuredBuffer<float4> outputBuffer;
+float2 res;
+
+[numthreads(32, 32, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    int2 pixel = id.xy;
+    float2 uv = ((float2)pixel)/32.0;
+    float4 color = inTex.SampleLevel(linearClampSampler, uv, 0);
+    if (pixel.x < res.x && pixel.y < res.y)
+    {
+        outputBuffer[id.y * uint(res.x) + id.x] = color;
+    }
+}
