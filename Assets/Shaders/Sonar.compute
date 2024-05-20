@@ -1,50 +1,30 @@
 #pragma kernel CSMain
 #pragma kernel CSClear
 
-#include "SonarVariables.cginc"
-
-
-float3 GetViewVec(float3 bottomLeft, float3 topLeft, float3 bottomRight, float3 topRight, float2 uv){
-    const float3 leftLerp = lerp(bottomLeft, topLeft, uv.y);
-    const float3 rightLerp = lerp(bottomRight, topRight, uv.y);
-    float3 viewVec = lerp(leftLerp, rightLerp, uv.x);
-    return normalize(viewVec);
-}
-
+RWTexture2D<float4> inputTex;
+RWTexture2D<float4> resultTex;
+uint2 res;
+float MaxRange;
 
 [numthreads(32, 32,1)]
 void CSClear (uint3 id : SV_DispatchThreadID)
 {
-    sonarTex[id.xy] = float4(0, 0, 0, 1);
+    resultTex[id.xy] = float4(0, 0, 0, 1);
 }
 
-[numthreads(32, 32,1)]
+[numthreads(32, 32, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    int2 pixel = id.xy;
-    float2 uv = float2(pixel.x/res.x, pixel.y/res.y);
-    float3 nWS = normalize(normalsTex[pixel.xy].xyz);
-    float3 viewDirWS = GetViewVec(BLws, TLws, BRws, TRws, uv);
-    float3 viewDirVS = GetViewVec(BLvs, TLvs, BRvs, TRvs, uv);
-
+    float4 pixelVal = inputTex[id.xy];
+    float d = pixelVal.r;
+    float intensity = pixelVal.g;
+    float azimuthRad = pixelVal.b;
     
-    float3 pointVS = (viewDirVS/viewDirVS.z)*depthTex[pixel.xy];
-
-    float d = length(pointVS);
-    float intensity = -dot(viewDirWS, nWS);
-    
-    debugTex[pixel.xy] = float4(nWS, 1.0);
-    // result RGB: [distance, intensity, azimuth]. azimuth is mapped to (-1, 1)
-    float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
-    float azimuthNormed = (azimuthRad * RAD2DEG) / (fov / 2.0);
-    float distanceNormed = d/sonarMaxRange;
-    resultTex[pixel.xy] = float4(clamp(distanceNormed, 0, 1), intensity, azimuthNormed, 1.0);
-    resultTex[pixel.xy] = float4(1, 1, 1, 1);
-
     // transform to 2D sonar image
+    float distanceNormed = d/MaxRange;
     int2 origin = int2(res.x/2, res.y/2);
     float2 sonarPixel = float2(distanceNormed * sin(azimuthRad) * 0.5 * res.x, distanceNormed * cos(azimuthRad) * 0.5 * res.y);
     int2 sonarPixelCentered = int2(sonarPixel) + origin;
 
-    sonarTex[sonarPixelCentered] = float4(intensity*float3(0, 1, 0), 1);
+    resultTex[sonarPixelCentered] = intensity*float4(pow(intensity, 5), 1, pow(intensity, 5), 1);
 }

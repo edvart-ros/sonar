@@ -6,7 +6,6 @@ Shader "Custom/SonarShader"
         _MainTex ("Texture", 2D) = "white" {}
         _NormalMap ("Texture", 2D) = "white" {}
         _SonarFOV ("float", float) = 60.0
-        _SonarRange ("float", float) = 20.0
         _SonarReflectivity ("float", float) = 1.0
     }
     SubShader
@@ -41,7 +40,6 @@ Shader "Custom/SonarShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float _SonarFOV;
-            float _SonarRange;
             float _SonarReflectivity;
 
             sampler2D _NormalMap;
@@ -67,8 +65,11 @@ Shader "Custom/SonarShader"
             float4 frag (v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                float3 viewDirWS = normalize(i.posWS - _WorldSpaceCameraPos);
-                float3 viewDirVS = -normalize(UnityWorldSpaceViewDir(i.posWS));
+                float3 camToFragmentWS = i.posWS - _WorldSpaceCameraPos;
+                float3 viewDirWS = normalize(camToFragmentWS);
+                float3 posVS = UnityWorldToViewPos(i.posWS);
+                posVS.z = -posVS.z;
+                float3 viewDirVS = normalize(posVS);
 
                 float3 normalSample = tex2D(_NormalMap, i.uv).xyz * 2.0 - 1.0;
                 float3 normalWS = normalize(
@@ -77,9 +78,9 @@ Shader "Custom/SonarShader"
                     normalSample.z * i.normalWS);
 
                 float intensity = -dot(viewDirWS, normalWS)*_SonarReflectivity;
-                float d = length(i.posWS - _WorldSpaceCameraPos);
-                float azimuthDeg = atan2(viewDirVS.x, viewDirVS.z)*Rad2Deg;
-                return float4(d, intensity, azimuthDeg, 1);
+                float d = length(camToFragmentWS);
+                float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
+                return float4(d, intensity, azimuthRad, 1);
             }
             ENDCG
         }
