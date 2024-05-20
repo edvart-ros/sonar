@@ -10,6 +10,7 @@ Shader "Custom/SonarLit"
         [MainTexture] _BaseColorMap("BaseColorMap", 2D) = "white" {}
         [HideInInspector] _BaseColorMap_MipInfo("_BaseColorMap_MipInfo", Vector) = (0, 0, 0, 0)
         
+        _SonarReflectivity("_SonarReflectivity", Range(0.0, 1.0)) = 1.0
         _Metallic("_Metallic", Range(0.0, 1.0)) = 0
         _Smoothness("Smoothness", Range(0.0, 1.0)) = 0.5
         _MaskMap("MaskMap", 2D) = "white" {}
@@ -365,7 +366,8 @@ Shader "Custom/SonarLit"
 
     // #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/Lit.cs.hlsl"
     #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/LitProperties.hlsl"
-
+    float _SonarReflectivity;
+    
     // TODO:
     // Currently, Lit.hlsl and LitData.hlsl are included for every pass. Split Lit.hlsl in two:
     // LitData.hlsl and LitShading.hlsl (merge into the existing LitData.hlsl).
@@ -1300,5 +1302,5 @@ Shader "Custom/SonarLit"
     }
 
     FallBack "Hidden/HDRP/FallbackError"
-    CustomEditor "Rendering.HighDefinition.LitGUI"
+    //CustomEditor "Rendering.HighDefinition.LitGUI"
 }

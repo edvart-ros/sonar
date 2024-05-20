@@ -7,7 +7,7 @@ Shader "Custom/SonarShader"
         _NormalMap ("Texture", 2D) = "white" {}
         _SonarFOV ("float", float) = 60.0
         _SonarRange ("float", float) = 20.0
-        _SonarIntensity ("float", float) = 1.0
+        _SonarReflectivity ("float", float) = 1.0
     }
     SubShader
     {
@@ -42,7 +42,7 @@ Shader "Custom/SonarShader"
             float4 _MainTex_ST;
             float _SonarFOV;
             float _SonarRange;
-            float _SonarIntensity;
+            float _SonarReflectivity;
 
             sampler2D _NormalMap;
             float4 _NormalMap_ST;
@@ -64,7 +64,7 @@ Shader "Custom/SonarShader"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            float4 frag (v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
                 float3 viewDirWS = normalize(i.posWS - _WorldSpaceCameraPos);
@@ -76,12 +76,10 @@ Shader "Custom/SonarShader"
                     normalSample.y * i.bitangentWS +
                     normalSample.z * i.normalWS);
 
-                float intensity = -dot(viewDirWS, normalWS);
+                float intensity = -dot(viewDirWS, normalWS)*_SonarReflectivity;
                 float d = length(i.posWS - _WorldSpaceCameraPos);
-                
                 float azimuthDeg = atan2(viewDirVS.x, viewDirVS.z)*Rad2Deg;
-                float azimuthNormed = azimuthDeg/(_SonarFOV/2.0);
-                return float4(clamp(d/_SonarRange, 0, 1), intensity, azimuthNormed, 1);
+                return float4(d, intensity, azimuthDeg, 1);
             }
             ENDCG
         }
