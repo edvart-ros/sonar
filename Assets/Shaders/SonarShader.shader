@@ -48,7 +48,7 @@ Shader "Custom/SonarShader"
 	        static const float Deg2Rad = 3.14 / 180.0;
 
 
-            v2f vert (appdata v)
+            const v2f vert (appdata v)
             {
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);
@@ -64,22 +64,22 @@ Shader "Custom/SonarShader"
 
             float4 frag (v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
-                float3 camToFragmentWS = i.posWS - _WorldSpaceCameraPos;
-                float3 viewDirWS = normalize(camToFragmentWS);
+                const float4 col = tex2D(_MainTex, i.uv);
+                const float3 camToFragmentWS = i.posWS - _WorldSpaceCameraPos;
+                const float3 viewDirWS = normalize(camToFragmentWS);
                 float3 posVS = UnityWorldToViewPos(i.posWS);
                 posVS.z = -posVS.z;
-                float3 viewDirVS = normalize(posVS);
+                const float3 viewDirVS = normalize(posVS);
 
-                float3 normalSample = tex2D(_NormalMap, i.uv).xyz * 2.0 - 1.0;
-                float3 normalWS = normalize(
+                const float3 normalSample = tex2D(_NormalMap, i.uv).xyz * 2.0 - 1.0;
+                const float3 normalWS = normalize(
                     normalSample.x * i.tangentWS +
                     normalSample.y * i.bitangentWS +
                     normalSample.z * i.normalWS);
 
-                float intensity = -dot(viewDirWS, normalWS)*_SonarReflectivity;
-                float d = length(camToFragmentWS);
-                float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
+                const float intensity = -dot(viewDirWS, normalWS)*_SonarReflectivity;
+                const float d = length(camToFragmentWS);
+                const float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
                 return float4(d, intensity, azimuthRad, 1);
             }
             ENDCG

@@ -50,6 +50,10 @@ public class Sonar : MonoBehaviour
         {
             Debug.LogError("input and output texture resolutions are not equal");
         }
+        SonarCompute.SetTexture(0, "inputTex", rawSonarShaderTex);
+        SonarCompute.SetTexture(0, "resultTex", resultSonarTex);
+        SonarCompute.SetTexture(1, "inputTex", rawSonarShaderTex);
+        SonarCompute.SetTexture(1, "resultTex", resultSonarTex);
     }
 
     void Update()
@@ -59,10 +63,6 @@ public class Sonar : MonoBehaviour
         res[1] = rawSonarShaderTex.height;
         SonarCompute.SetInts("res", res);
         SonarCompute.SetFloat("MaxRange", sonarRange);
-        SonarCompute.SetTexture(0, "inputTex", rawSonarShaderTex);
-        SonarCompute.SetTexture(0, "resultTex", resultSonarTex);
-        SonarCompute.SetTexture(1, "inputTex", rawSonarShaderTex);
-        SonarCompute.SetTexture(1, "resultTex", resultSonarTex);
         SonarCompute.Dispatch(clearKernelID, res[0]/32, res[1]/32, 1);
         SonarCompute.Dispatch(mainKernelID, res[0]/32, res[1]/32, 1);
     }
