@@ -37,6 +37,13 @@ Shader "Custom/SonarShader"
                 float3 bitangentWS : TEXCOORD5; // Bitangent in world space
             };
 
+            struct MultipleFragmentOutput
+            {
+                half4 dest0 : SV_Target0;
+                half4 dest1 : SV_Target1;
+            };
+
+
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float _SonarFOV;
@@ -62,8 +69,9 @@ Shader "Custom/SonarShader"
                 return o;
             }
 
-            float4 frag (v2f i) : SV_Target
+            MultipleFragmentOutput frag (v2f i) : SV_Target
             {
+                MultipleFragmentOutput o;
                 const float4 col = tex2D(_MainTex, i.uv);
                 const float3 camToFragmentWS = i.posWS - _WorldSpaceCameraPos;
                 const float3 viewDirWS = normalize(camToFragmentWS);
@@ -80,7 +88,9 @@ Shader "Custom/SonarShader"
                 const float intensity = -dot(viewDirWS, normalWS)*_SonarReflectivity;
                 const float d = length(camToFragmentWS);
                 const float azimuthRad = atan2(viewDirVS.x, viewDirVS.z);
-                return float4(d, intensity, azimuthRad, 1);
+                o.dest0 = float4(d, intensity, azimuthRad, 1);
+                o.dest1 = float4(normalWS, 1);
+                return o;
             }
             ENDCG
         }
